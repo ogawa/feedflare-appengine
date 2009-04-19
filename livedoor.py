@@ -23,19 +23,22 @@ class LivedoorClipHandler(webapp.RequestHandler):
 
 class LivedoorClipItemHandler(webapp.RequestHandler):
   def get(self, url):
-    json_url = 'http://api.clip.livedoor.com/json/comments?link=%s' % url
-    result = urlfetch.fetch(json_url)
     count = 0
-    if result.status_code == 200:
-      content = result.content
-      json_obj = json.read(content)
-      if json_obj['isSuccess'] == 1:
-        count = int(json_obj['total_clip_count'])
+    json_url = 'http://api.clip.livedoor.com/json/comments?link=%s' % url
+    try:
+      result = urlfetch.fetch(json_url)
+      if result.status_code == 200:
+        content = result.content
+        json_obj = json.read(content)
+        if json_obj['isSuccess'] == 1:
+          count = int(json_obj['total_clip_count'])
+    except:
+      pass
     text = 'Save to livedoor clip'
     if count == 1:
-      text += ' (' + str(count) + ' save)'
+      text += ' (%d save)' % count
     elif count > 1:
-      text += ' (' + str(count) + ' saves)'
+      text += ' (%d saves)' % count
     self.response.headers['Content-Type'] = 'text/plain'
     self.response.out.write("""<FeedFlare>
   <Text>%s</Text>

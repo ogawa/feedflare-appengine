@@ -24,20 +24,23 @@ class HatenaBookmarkHandler(webapp.RequestHandler):
 
 class HatenaBookmarkItemHandler(webapp.RequestHandler):
   def get(self, url):
+    count = 0
     url = urllib.unquote(url)
     json_url = 'http://b.hatena.ne.jp/entry/json/%s' % url
-    result = urlfetch.fetch(json_url)
-    count = 0
-    if result.status_code == 200:
-      content = result.content[1:-1]
-      if content != 'null':
-        json_obj = json.read(content)
-        count = int(json_obj['count'])
+    try:
+      result = urlfetch.fetch(json_url)
+      if result.status_code == 200:
+        content = result.content[1:-1]
+        if content != 'null':
+          json_obj = json.read(content)
+          count = int(json_obj['count'])
+    except:
+      pass
     text = 'Save to hatena'
     if count == 1:
-      text += ' (' + str(count) + ' save)'
+      text += ' (%d save)' % count
     elif count > 1:
-      text += ' (' + str(count) + ' saves)'
+      text += ' (%d saves)' % count
     self.response.headers['Content-Type'] = 'text/plain'
     self.response.out.write("""<FeedFlare>
   <Text>%s</Text>
