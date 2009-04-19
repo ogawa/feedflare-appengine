@@ -10,10 +10,11 @@ class RootHandler(webapp.RequestHandler):
 
 <ul>
 <li><a href="%shatena">Hatena Bookmark</a></li>
+<li><a href="%slivedoor">Livedoor Clip</a></li>
 </ul>
 
 <p>maintained by <a href="http://blog.as-is.net/">Hirotaka Ogawa</a></p>
-""" % path_url)
+""" % (path_url, path_url))
 
 def main():
   application = webapp.WSGIApplication(

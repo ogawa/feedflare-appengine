@@ -10,5 +10,8 @@ handlers:
 - url: /hatena.*
   script: hatena.py
 
+- url: /livedoor.*
+  script: livedoor.py
+
 #- url: .*
 #  script: main.py
