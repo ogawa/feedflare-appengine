@@ -6,14 +6,22 @@ class RootHandler(webapp.RequestHandler):
   def get(self):
     path_url = self.request.path_url
     self.response.out.write("""
-<h1>Experimental FeedFlares</h1>
+<html>
+<body>
+<h1>FeedFlare-AppEngine</h1>
 
+<dl>
+<dt>code</dt><dd><a href="http://code.google.com/p/feedflare-appengine/">feedflare-appengine - Google Code</a></dd>
+<dt>maintainer</dt><dd><a href="http://blog.as-is.net/">Hirotaka Ogawa</a></dd>
+</dl>
+
+<h2>FeedFlare Catalog</h2>
 <ul>
 <li><a href="%shatena">Hatena Bookmark</a></li>
 <li><a href="%slivedoor">Livedoor Clip</a></li>
 </ul>
-
-<p>maintained by <a href="http://blog.as-is.net/">Hirotaka Ogawa</a></p>
+</body>
+</html>
 """ % (path_url, path_url))
 
 def main():

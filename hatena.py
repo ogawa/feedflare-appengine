@@ -5,25 +5,31 @@ from google.appengine.api import urlfetch
 import json
 import urllib
 
-class HatenaBookmarkHandler(webapp.RequestHandler):
+class HatenaBookmarkFlare(webapp.RequestHandler):
   def get(self):
+    url = self.request.get('url', default_value='')
+    if url == '':
+      self.get_flare_unit()
+    else:
+      self.get_flare_item(url)
+
+  def get_flare_unit(self):
     path_url = self.request.path_url
     self.response.headers['Content-Type'] = 'text/plain'
     self.response.out.write("""<FeedFlareUnit>
   <Catalog>
-    <Title>Save to hatena</Title>
+    <Title>Save to hatena bookmark</Title>
     <Description>Save this item to the hatena bookmarking service.</Description>
   </Catalog>
-  <DynamicFlare href="%s/${link}"/>
+  <DynamicFlare href="%s?url=${link}"/>
   <SampleFlare>
-    <Text>Save to hatena</Text>
+    <Text>Save to hatena bookmark (23 saves)</Text>
     <Link href="http://b.hatena.ne.jp/entry/{$link}" />
   </SampleFlare>
 </FeedFlareUnit>
 """ % path_url)
 
-class HatenaBookmarkItemHandler(webapp.RequestHandler):
-  def get(self, url):
+  def get_flare_item(self, url):
     count = 0
     url = urllib.unquote(url)
     json_url = 'http://b.hatena.ne.jp/entry/json/%s' % url
@@ -51,8 +57,7 @@ class HatenaBookmarkItemHandler(webapp.RequestHandler):
 def main():
   application = webapp.WSGIApplication(
     [
-      ('/hatena', HatenaBookmarkHandler),
-      (r'/hatena/(.+)', HatenaBookmarkItemHandler),
+      ('/hatena', HatenaBookmarkFlare),
       ],
     debug=False)
   run_wsgi_app(application)

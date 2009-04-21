@@ -4,8 +4,15 @@ from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.api import urlfetch
 import json
 
-class LivedoorClipHandler(webapp.RequestHandler):
+class LivedoorClipFlare(webapp.RequestHandler):
   def get(self):
+    url = self.request.get('url', default_value='')
+    if url == '':
+      self.get_flare_unit()
+    else:
+      self.get_flare_item(url)
+
+  def get_flare_unit(self):
     path_url = self.request.path_url
     self.response.headers['Content-Type'] = 'text/plain'
     self.response.out.write("""<FeedFlareUnit>
@@ -13,16 +20,15 @@ class LivedoorClipHandler(webapp.RequestHandler):
     <Title>Save to livedoor clip</Title>
     <Description>Save this item to the "livedoor clip" bookmarking service.</Description>
   </Catalog>
-  <DynamicFlare href="%s/${link}"/>
+  <DynamicFlare href="%s?url=${link}"/>
   <SampleFlare>
-    <Text>Save to livedoor clip</Text>
+    <Text>Save to livedoor clip (23 saves)</Text>
     <Link href="http://clip.livedoor.com/redirect?link={$link}" />
   </SampleFlare>
 </FeedFlareUnit>
 """ % path_url)
 
-class LivedoorClipItemHandler(webapp.RequestHandler):
-  def get(self, url):
+  def get_flare_item(self, url):
     count = 0
     json_url = 'http://api.clip.livedoor.com/json/comments?link=%s' % url
     try:
@@ -49,8 +55,7 @@ class LivedoorClipItemHandler(webapp.RequestHandler):
 def main():
   application = webapp.WSGIApplication(
     [
-      ('/livedoor', LivedoorClipHandler),
-      (r'/livedoor/(.+)', LivedoorClipItemHandler),
+      ('/livedoor', LivedoorClipFlare),
       ],
     debug=False)
   run_wsgi_app(application)
