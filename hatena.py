@@ -2,8 +2,8 @@
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.api import urlfetch
-import json
 import urllib
+import json
 
 class HatenaBookmarkFlare(webapp.RequestHandler):
   def get(self):
@@ -31,7 +31,6 @@ class HatenaBookmarkFlare(webapp.RequestHandler):
 
   def get_flare_item(self, url):
     count = 0
-    url = urllib.unquote(url)
     json_url = 'http://b.hatena.ne.jp/entry/json/%s' % url
     try:
       result = urlfetch.fetch(json_url)
@@ -42,7 +41,7 @@ class HatenaBookmarkFlare(webapp.RequestHandler):
           count = int(json_obj['count'])
     except:
       pass
-    text = 'Save to hatena'
+    text = 'Save to hatena bookmark'
     if count == 1:
       text += ' (%d save)' % count
     elif count > 1:
@@ -54,10 +53,16 @@ class HatenaBookmarkFlare(webapp.RequestHandler):
 </FeedFlare>
 """ % (text, url))
 
+class HatenaBookmarkFlareCompat(HatenaBookmarkFlare):
+  def get(self, url):
+    url = urllib.unquote(url)
+    self.get_flare_item(url)
+
 def main():
   application = webapp.WSGIApplication(
     [
       ('/hatena', HatenaBookmarkFlare),
+      ('/hatena/(.+)', HatenaBookmarkFlareCompat),
       ],
     debug=False)
   run_wsgi_app(application)

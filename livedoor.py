@@ -2,6 +2,7 @@
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.api import urlfetch
+import urllib
 import json
 
 class LivedoorClipFlare(webapp.RequestHandler):
@@ -50,12 +51,18 @@ class LivedoorClipFlare(webapp.RequestHandler):
   <Text>%s</Text>
   <Link href="http://clip.livedoor.com/redirect?link=%s" />
 </FeedFlare>
-""" % (text, url))
+""" % (text, urllib.quote(url)))
+
+class LivedoorClipFlareCompat(LivedoorClipFlare):
+  def get(self, url):
+    url = urllib.unquote(url)
+    self.get_flare_item(url)
 
 def main():
   application = webapp.WSGIApplication(
     [
       ('/livedoor', LivedoorClipFlare),
+      ('/livedoor/(.+)', LivedoorClipFlareCompat),
       ],
     debug=False)
   run_wsgi_app(application)
